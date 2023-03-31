@@ -1,0 +1,29 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Attacks {
+    id                String      @id 
+    type              String?  
+    severity          String?  
+    kill_chain_phase    String?
+    timestamp         String?
+    attackerid        String?
+    attackerip        String?
+    attackername      String?
+    attackerport      Int?
+    decoyid           Int?
+    decoyname         String?
+    decoygroup        String?
+    decoyip           String?
+    decoyport         String?
+    decoytype         String?
+}
