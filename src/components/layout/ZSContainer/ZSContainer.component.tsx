@@ -5,7 +5,7 @@ import { ZSContainerProps } from './ZSContainer.types'
 const ZSContainer = ({ children }: ZSContainerProps) => {
     return <>
         <ZSHeader />
-        {children}
+        <div className="p-5">{children}</div>
     </>
 }
 

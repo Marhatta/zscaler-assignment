@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { ZSDatePickerProps } from './ZSDatePicker.types';
+import { isValid } from 'date-fns';
+import { DateTimePicker } from '@mui/x-date-pickers';
 
-export default function ZSDatePicker({ label = "Choose Date", onSelectDate }: ZSDatePickerProps) {
-    const [value, setValue] = useState(null);
+export default function ZSDatePicker({ label = "Choose Date", onSelectDate, currentValue }: ZSDatePickerProps) {
+    const [value, setValue] = useState<Date | string | undefined>(currentValue ? new Date(currentValue) : undefined);
     return (
-        <DatePicker label={label} value={value} onChange={newValue => {
-            setValue(newValue);
-            onSelectDate?.(newValue);
+        <DateTimePicker label={label} value={value} onChange={newValue => {
+            if (!isValid(newValue)) return;
+            setValue(newValue as Date);
+            onSelectDate?.(newValue as Date);
         }} />
     );
 }

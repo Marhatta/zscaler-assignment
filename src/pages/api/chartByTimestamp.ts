@@ -1,6 +1,7 @@
 import methods from '@/utils/api/methods';
 import statusCode from '@/utils/api/statusCodes';
 import { PrismaClient } from '@prisma/client';
+import { format } from 'date-fns';
 import { NextApiRequest, NextApiResponse } from 'next';
 const prisma = new PrismaClient();
 
@@ -13,10 +14,33 @@ export default async function handler(
       .status(statusCode.METHOD_NOT_ALLOWED)
       .json({ message: 'method not allowed', data: null });
   }
+
+  const { startDate, endDate } = req.query;
+
+  // verify startDate and endDate
+  if (!startDate || !endDate) {
+    res
+      .status(statusCode.BAD_REQUEST)
+      .json({ message: 'Invalid start or end date', data: null });
+  }
+
+  const formattedStartDate = format(
+    new Date(startDate as string),
+    `yyyy-MM-dd'T'HH:mm:ss'Z'`
+  );
+  const formattedEndDate = format(
+    new Date(endDate as string),
+    `yyyy-MM-dd'T'HH:mm:ss'Z'`
+  );
   try {
     const resp = await prisma.attacks.groupBy({
       by: ['timestamp'],
-      where: { timestamp: { gte: '2021-08-20', lt: '2021-08-24' } },
+      where: {
+        timestamp: {
+          gte: formattedStartDate,
+          lte: formattedEndDate
+        }
+      },
       _count: true
     });
     res.status(statusCode.OK).json({ message: 'success', data: resp });

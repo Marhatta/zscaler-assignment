@@ -1,4 +1,5 @@
 export interface ZSDatePickerProps {
   label: string;
-  onSelectDate?: (date: Date | null) => void;
+  onSelectDate?: (date: Date) => void;
+  currentValue?: Date | string | undefined;
 }

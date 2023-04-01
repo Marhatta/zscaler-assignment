@@ -14,8 +14,8 @@ model Attacks {
     id                String      @id 
     type              String?  
     severity          String?  
-    kill_chain_phase    String?
-    timestamp         String?
+    kill_chain_phase  String?
+    timestamp         DateTime?
     attackerid        String?
     attackerip        String?
     attackername      String?
