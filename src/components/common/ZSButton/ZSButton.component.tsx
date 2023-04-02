@@ -4,7 +4,11 @@ import { ZSButtonProps } from './ZSButton.types';
 
 const ZSButton = ({ variant = 'outlined', children = 'title', onClick }: ZSButtonProps) => {
     return (
-        <Button variant={variant} onClick={onClick}>{children}</Button>
+        <Button
+            variant={variant}
+            onClick={onClick}>
+            {children}
+        </Button>
     );
 }
 

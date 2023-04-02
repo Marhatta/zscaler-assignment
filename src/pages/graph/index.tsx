@@ -13,7 +13,6 @@ interface ChartProps {
     isLoading: boolean,
     data: Array<{ timestamp: string, _count: number }>
 }
-
 // validate the start and the end date
 const validateDates = (startDate: string, endDate: string) => {
     if (!startDate || !endDate) {
@@ -45,7 +44,7 @@ const Chart = ({ isLoading, data = [] }: ChartProps) => {
             <ResponsiveContainer width={'100%'} height={'100%'}>
                 <LineChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="timestamp" tickFormatter={(value) => format(new Date(value), 'MM/dd/yyyy a')} />
+                    <XAxis dataKey="timestamp" tickFormatter={(value) => format(new Date(value), 'MM/dd/yyyy')} />
                     <Tooltip />
                     <Legend />
                     <Line type="monotone" dataKey="_count" stroke="#8884d8" strokeWidth={3} name='Events' />
@@ -61,6 +60,7 @@ const Graph: NextPage = () => {
     const [endDate, setEndDate] = useState<string | Date>('08/05/2021');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [data, setData] = useState([]);
+
 
     //load the initial chart data
     useEffect(() => {
@@ -85,18 +85,18 @@ const Graph: NextPage = () => {
         }
     }
 
+    // fetches chart data on valid submission
     const onSubmit = () => {
         const valid = validateDates(startDate as string, endDate as string);
         if (!valid) return;
         fetchChartData();
     }
 
-
+    // returns the page jsx
     return <>
         <span className='text-gray-600'>Please choose date</span>
         <div className='flex space-x-3 h-full mt-2'>
             <ZSDatePicker label='Start Date' currentValue={startDate} onSelectDate={date => {
-
                 setStartDate(new Date(date as Date).toISOString())
             }} />
             <ZSDatePicker label='End Date' currentValue={endDate} onSelectDate={date => {

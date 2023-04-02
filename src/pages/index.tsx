@@ -22,6 +22,6 @@ export default function Home() {
       <ZSButton onClick={() => router.push('/graph')}>Visit graph</ZSButton>
       <ZSButton onClick={() => router.push('/table')}>Visit table</ZSButton>
     </div>
-    <div className="mt-10">Logo credits <a href="https://www.zscaler.com/" className="text-blue-500 font-semibold">zscaler</a> </div>
+    <div className="mt-10">Logo credits <a href="https://www.zscaler.com/" target='_blank' className="text-blue-500 font-semibold">zscaler</a> </div>
   </div>
 }

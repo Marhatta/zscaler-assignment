@@ -10,18 +10,22 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method !== methods.GET) {
-    res
-      .status(statusCode.METHOD_NOT_ALLOWED)
-      .json({ message: 'method not allowed', data: null });
+    res.status(statusCode.METHOD_NOT_ALLOWED).json({
+      message: 'method not allowed',
+      data: null,
+      statusCode: statusCode.METHOD_NOT_ALLOWED
+    });
   }
 
   const { startDate, endDate } = req.query;
 
   // verify startDate and endDate
   if (!startDate || !endDate) {
-    res
-      .status(statusCode.BAD_REQUEST)
-      .json({ message: 'Invalid start or end date', data: null });
+    res.status(statusCode.BAD_REQUEST).json({
+      message: 'Invalid start or end date',
+      data: null,
+      statusCode: statusCode.BAD_REQUEST
+    });
   }
 
   const formattedStartDate = format(
@@ -32,6 +36,7 @@ export default async function handler(
     new Date(endDate as string),
     `yyyy-MM-dd'T'HH:mm:ss'Z'`
   );
+
   try {
     const chartData = await prisma.attacks.groupBy({
       by: ['timestamp'],
@@ -43,10 +48,16 @@ export default async function handler(
       },
       _count: true
     });
-    res.status(statusCode.OK).json({ message: 'success', data: chartData });
+    res.status(statusCode.OK).json({
+      message: 'success',
+      data: chartData,
+      statusCode: statusCode.OK
+    });
   } catch (error: any) {
-    res
-      .status(statusCode.INTERNAL_SERVER_ERROR)
-      .json({ message: 'error', data: error.message });
+    res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+      message: 'error',
+      data: error.message,
+      statusCode: statusCode.INTERNAL_SERVER_ERROR
+    });
   }
 }

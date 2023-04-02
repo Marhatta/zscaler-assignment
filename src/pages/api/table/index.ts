@@ -1,7 +1,7 @@
 import methods from '@/utils/api/methods';
 import statusCode from '@/utils/api/statusCodes';
 import { PrismaClient } from '@prisma/client';
-import { format } from 'date-fns';
+import { format, isBefore } from 'date-fns';
 import { NextApiRequest, NextApiResponse } from 'next';
 const prisma = new PrismaClient();
 
@@ -47,7 +47,17 @@ export default async function handler(
     `yyyy-MM-dd'T'HH:mm:ss'Z'`
   );
 
-  if (field !== 'undefined' || value !== 'undefined') {
+  // check if end date it before start date
+  if (isBefore(new Date(formattedEndDate), new Date(formattedStartDate))) {
+    res.status(statusCode.BAD_REQUEST).json({
+      message: 'End date cannot be before start date',
+      data: null,
+      statusCode: statusCode.BAD_REQUEST
+    });
+  }
+
+  // checks if filters are provided in the query params -  then applies those filters
+  if (field !== 'undefined' && value !== 'undefined') {
     const mappedOperator = convertOperator(operator as string);
     try {
       const paginatedData = await prisma.attacks.findMany({
@@ -91,13 +101,18 @@ export default async function handler(
         rows: paginatedData,
         totalRowCount
       };
-      res.status(statusCode.OK).json({ message: 'success', data });
-    } catch (error: any) {
       res
-        .status(statusCode.INTERNAL_SERVER_ERROR)
-        .json({ message: 'error', data: error.message });
+        .status(statusCode.OK)
+        .json({ message: 'success', data, statusCode: statusCode.OK });
+    } catch (error: any) {
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+        message: 'error',
+        data: error.message,
+        statusCode: statusCode.INTERNAL_SERVER_ERROR
+      });
     }
   } else {
+    // else returns paginated date based on start & end date only
     try {
       const paginatedData = await prisma.attacks.findMany({
         take: +rowsPerPage,
@@ -122,11 +137,15 @@ export default async function handler(
         rows: paginatedData,
         totalRowCount
       };
-      res.status(statusCode.OK).json({ message: 'success', data });
-    } catch (error: any) {
       res
-        .status(statusCode.INTERNAL_SERVER_ERROR)
-        .json({ message: 'error', data: error.message });
+        .status(statusCode.OK)
+        .json({ message: 'success', data, statusCode: statusCode.OK });
+    } catch (error: any) {
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+        message: 'error',
+        data: error.message,
+        statusCode: statusCode.INTERNAL_SERVER_ERROR
+      });
     }
   }
 }
