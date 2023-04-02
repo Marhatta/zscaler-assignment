@@ -14,9 +14,7 @@ export default async function handler(
       .status(statusCode.METHOD_NOT_ALLOWED)
       .json({ message: 'method not allowed', data: null });
   }
-
-  const { startDate, endDate } = req.query;
-
+  const { pageNumber = 0, rowsPerPage = 10, startDate, endDate } = req.query;
   // verify startDate and endDate
   if (!startDate || !endDate) {
     res
@@ -32,18 +30,31 @@ export default async function handler(
     new Date(endDate as string),
     `yyyy-MM-dd'T'HH:mm:ss'Z'`
   );
+
   try {
-    const chartData = await prisma.attacks.groupBy({
-      by: ['timestamp'],
+    const paginatedData = await prisma.attacks.findMany({
+      take: +rowsPerPage,
+      skip: +pageNumber * +rowsPerPage,
       where: {
         timestamp: {
-          gte: formattedStartDate,
-          lte: formattedEndDate
+          lte: formattedEndDate,
+          gte: formattedStartDate
         }
-      },
-      _count: true
+      }
     });
-    res.status(statusCode.OK).json({ message: 'success', data: chartData });
+    const totalRowCount = await prisma.attacks.count({
+      where: {
+        timestamp: {
+          lte: formattedEndDate,
+          gte: formattedStartDate
+        }
+      }
+    });
+    const data = {
+      rows: paginatedData,
+      totalRowCount
+    };
+    res.status(statusCode.OK).json({ message: 'success', data });
   } catch (error: any) {
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
