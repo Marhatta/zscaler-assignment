@@ -19,8 +19,8 @@ model Attacks {
     attackerid        String?
     attackerip        String?
     attackername      String?
-    attackerport      Int?
-    decoyid           Int?
+    attackerport      String?
+    decoyid           String?
     decoyname         String?
     decoygroup        String?
     decoyip           String?
