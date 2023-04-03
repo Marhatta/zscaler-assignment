@@ -46,10 +46,10 @@ const columns: GridColDef[] = [
     { field: 'decoyip', headerName: 'Decoy Ip', width: 150 },
     { field: 'decoyport', headerName: 'Decoy Port', width: 100 },
     { field: 'decoytype', headerName: 'Decoy Type', width: 150 },
-    { field: 'kill_chain_phase', headerName: 'KIll Chain Phase', width: 200 },
+    { field: 'kill_chain_phase', headerName: 'Kill Chain Phase', width: 200 },
 ];
 
-// formats the timestamp to readable format - MM/dd/yyyy
+// formats the timestamp to readable format - MM/dd/yyyy HH:mm a
 const formatTimestamp = (value: Date) => {
     return format(new Date(value), 'MM/dd/yyyy HH:mm a')
 }
@@ -62,7 +62,7 @@ const Table: NextPage = () => {
     const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>(VISIBILITY_COLUMNS);
     const [paginationModel, setPaginationModel] = useState({
         page: 0,
-        pageSize: 5,
+        pageSize: 10,
     });
 
     // fetches the data from the api
@@ -105,7 +105,7 @@ const Table: NextPage = () => {
                 rows={tableData?.data?.rows || []}
                 columns={columns}
                 rowCount={rowCountState}
-                pageSizeOptions={[5, 10, 20]}
+                pageSizeOptions={[10, 20, 50]}
                 loading={isLoading}
                 paginationMode="server"
                 paginationModel={paginationModel}

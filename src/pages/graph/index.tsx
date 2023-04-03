@@ -7,6 +7,7 @@ import { NextPage } from 'next';
 import { toast } from 'react-hot-toast';
 import { format, isBefore } from 'date-fns';
 import getData from '@/utils/rest/getData';
+import { ErrorBoundary } from 'react-error-boundary';
 
 
 interface ChartProps {
@@ -34,28 +35,31 @@ const formatTimeStamp = (value: string) => {
 }
 
 // shows the time series chart
-const Chart = ({ isLoading, data = [] }: ChartProps) => {
+export const Chart = ({ isLoading = false, data = [] }: ChartProps) => {
     if (isLoading) {
         return <div className='h-64 w-full flex justify-center items-center'><ZSLoader show={true} /></div>
     }
     else if (data.length === 0) {
-        return <div className='h-64 flex justify-center items-center'>
+        return <div className='h-64 flex justify-center items-center' data-testid='noDataFound'>
             <span>No data found</span>
         </div>
     }
     return (
-        <div className='h-96 mt-8'>
-            <span className='text-gray-600'>Time Series representing events occured in a particular timeframe</span>
-            <ResponsiveContainer width={'100%'} height={'100%'}>
-                <LineChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="timestamp" tickFormatter={(value) => formatTimeStamp(value)} />
-                    <Tooltip labelFormatter={(value) => formatTimeStamp(value)} />
-                    <Legend />
-                    <Line type="monotone" dataKey="_count" stroke="#8884d8" strokeWidth={3} name='Events' />
-                </LineChart>
-            </ResponsiveContainer>
+        <div className='h-96 mt-8' data-testid='chartContainer'>
+            <ErrorBoundary fallback={<span>Loading...</span>}>
+                <span className='text-gray-600'>Time Series representing events occured in a particular timeframe</span>
+                <ResponsiveContainer width={'100%'} height={'100%'}>
+                    <LineChart data={data}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="timestamp" tickFormatter={(value) => formatTimeStamp(value)} />
+                        <Tooltip labelFormatter={(value) => formatTimeStamp(value)} />
+                        <Legend />
+                        <Line type="monotone" dataKey="_count" stroke="#8884d8" strokeWidth={3} name='Events' />
+                    </LineChart>
+                </ResponsiveContainer>
+            </ErrorBoundary>
         </div>
+
     )
 }
 
