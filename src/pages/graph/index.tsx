@@ -28,6 +28,11 @@ const validateDates = (startDate: string, endDate: string) => {
     return true;
 }
 
+// formats the timestamp
+const formatTimeStamp = (value: string) => {
+    return format(new Date(value), 'MM/dd/yyyy HH:mm a')
+}
+
 // shows the time series chart
 const Chart = ({ isLoading, data = [] }: ChartProps) => {
     if (isLoading) {
@@ -44,8 +49,8 @@ const Chart = ({ isLoading, data = [] }: ChartProps) => {
             <ResponsiveContainer width={'100%'} height={'100%'}>
                 <LineChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="timestamp" tickFormatter={(value) => format(new Date(value), 'MM/dd/yyyy')} />
-                    <Tooltip />
+                    <XAxis dataKey="timestamp" tickFormatter={(value) => formatTimeStamp(value)} />
+                    <Tooltip labelFormatter={(value) => formatTimeStamp(value)} />
                     <Legend />
                     <Line type="monotone" dataKey="_count" stroke="#8884d8" strokeWidth={3} name='Events' />
                 </LineChart>

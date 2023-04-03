@@ -40,6 +40,7 @@ export default async function handler(
   try {
     const chartData = await prisma.attacks.groupBy({
       by: ['timestamp'],
+      orderBy: [{ timestamp: 'asc' }],
       where: {
         timestamp: {
           gte: formattedStartDate,
