@@ -100,7 +100,7 @@ const Graph: NextPage = () => {
     // returns the page jsx
     return <>
         <span className='text-gray-600'>Please choose date</span>
-        <div className='flex space-x-3 h-full mt-2'>
+        <div className='flex justify-between sm:justify-start space-x-0 sm:space-x-3 h-full mt-4 space-y-4 sm:space-y-0 flex-wrap sm:flex-nowrap'>
             <ZSDatePicker label='Start Date' currentValue={startDate} onSelectDate={date => {
                 setStartDate(new Date(date as Date).toISOString())
             }} />
