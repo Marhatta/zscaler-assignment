@@ -19,6 +19,12 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "jest.config.mjs",
+    "src/components/common/ZSButton/ZSButton.test.tsx"
+  ],
   "exclude": ["node_modules"]
 }
