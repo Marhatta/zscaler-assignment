@@ -85,7 +85,7 @@ const Graph: NextPage = () => {
                 setData(chartData.data);
             }
             else if (error) {
-                toast.error("Something went wrong while fetching the data");
+                toast.error('Something went wrong while fetching the data');
             }
         } catch (e: any) {
             toast.error(e?.message)

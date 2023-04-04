@@ -1,19 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import useSWR from 'swr';
-import { DataGrid, GridColDef, GridColumnVisibilityModel, GridFilterModel } from '@mui/x-data-grid';
+import {
+    DataGrid,
+    GridColDef,
+    GridColumnVisibilityModel,
+    GridFilterModel
+} from '@mui/x-data-grid';
 import ZSDatePicker from '@/components/common/ZSDatePicker';
 import { format } from 'date-fns';
 import statusCode from '@/utils/api/statusCodes';
 import ZSError from '@/components/common/ZSError';
 import { NextPage } from 'next';
 
-
 type FilterType = {
-    field: string,
-    operator: string,
-    id?: number | string | undefined,
-    value?: string | undefined
-}
+    field: string;
+    operator: string;
+    id?: number | string | undefined;
+    value?: string | undefined;
+};
 
 // maintained to handle the visibility state of the columns
 const VISIBILITY_COLUMNS = {
@@ -25,12 +29,14 @@ const VISIBILITY_COLUMNS = {
     decoyip: false,
     decoyport: false,
     decoytype: false
-}
+};
 
 // list of columns in the table
 const columns: GridColDef[] = [
     {
-        field: 'timestamp', headerName: 'Timestamp', width: 200,
+        field: 'timestamp',
+        headerName: 'Timestamp',
+        width: 200,
         valueFormatter: ({ value }) => formatTimestamp(value),
         filterable: false
     },
@@ -46,31 +52,32 @@ const columns: GridColDef[] = [
     { field: 'decoyip', headerName: 'Decoy Ip', width: 150 },
     { field: 'decoyport', headerName: 'Decoy Port', width: 100 },
     { field: 'decoytype', headerName: 'Decoy Type', width: 150 },
-    { field: 'kill_chain_phase', headerName: 'Kill Chain Phase', width: 200 },
+    { field: 'kill_chain_phase', headerName: 'Kill Chain Phase', width: 200 }
 ];
 
 // formats the timestamp to readable format - MM/dd/yyyy HH:mm a
 const formatTimestamp = (value: Date) => {
-    return format(new Date(value), 'MM/dd/yyyy HH:mm a')
-}
-
+    return format(new Date(value), 'MM/dd/yyyy HH:mm a');
+};
 
 const Table: NextPage = () => {
     const [startDate, setStartDate] = useState<string | Date>('08/04/2021');
     const [endDate, setEndDate] = useState<string | Date>('08/05/2021');
     const [filterValues, setFilterValues] = useState<FilterType | null>(null);
-    const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>(VISIBILITY_COLUMNS);
+    const [columnVisibilityModel, setColumnVisibilityModel] =
+        useState<GridColumnVisibilityModel>(VISIBILITY_COLUMNS);
     const [paginationModel, setPaginationModel] = useState({
         page: 0,
-        pageSize: 10,
+        pageSize: 10
     });
 
     // fetches the data from the api
-    const { data: tableData = [], isLoading } =
-        useSWR(`/api/table?pageNumber=${paginationModel.page}&rowsPerPage=${paginationModel.pageSize}&startDate=${startDate}&endDate=${endDate}&field=${filterValues?.field}&value=${filterValues?.value}&operator=${filterValues?.operator}`);
+    const { data: tableData = [], isLoading } = useSWR(
+        `/api/table?pageNumber=${paginationModel.page}&rowsPerPage=${paginationModel.pageSize}&startDate=${startDate}&endDate=${endDate}&field=${filterValues?.field}&value=${filterValues?.value}&operator=${filterValues?.operator}`
+    );
     // maintains the total row count coming from the api
     const [rowCountState, setRowCountState] = useState<number | undefined>(
-        tableData?.data?.totalRowCount || 0,
+        tableData?.data?.totalRowCount || 0
     );
 
     // when the total rows change, update the local state
@@ -78,7 +85,7 @@ const Table: NextPage = () => {
         setRowCountState((prevRowCountState: number | undefined) =>
             tableData?.data?.totalRowCount !== undefined
                 ? tableData?.data?.totalRowCount
-                : prevRowCountState,
+                : prevRowCountState
         );
     }, [tableData?.data?.totalRowCount, setRowCountState]);
 
@@ -87,33 +94,47 @@ const Table: NextPage = () => {
         setFilterValues(filterModel.items[0]);
     }, []);
 
-
     // returns the page jsx
-    return <div className='w-full h-[75vh]'>
-        <div className='flex space-x-3 py-3'>
-            <ZSDatePicker label='Start Date' currentValue={startDate} onSelectDate={date => {
-                setStartDate(new Date(date as Date).toISOString())
-            }} />
-            <ZSDatePicker label='End Date' currentValue={endDate} onSelectDate={date => {
-                setEndDate(new Date(date as Date).toISOString())
-            }} />
+    return (
+        <div className="w-full h-[75vh]">
+            <div className="flex space-x-3 py-3">
+                <ZSDatePicker
+                    label="Start Date"
+                    currentValue={startDate}
+                    onSelectDate={date => {
+                        setStartDate(new Date(date as Date).toISOString());
+                    }}
+                />
+                <ZSDatePicker
+                    label="End Date"
+                    currentValue={endDate}
+                    onSelectDate={date => {
+                        setEndDate(new Date(date as Date).toISOString());
+                    }}
+                />
+            </div>
+            {tableData?.statusCode === statusCode.BAD_REQUEST ? (
+                <ZSError message={tableData?.message} />
+            ) : (
+                <DataGrid
+                    columnVisibilityModel={columnVisibilityModel}
+                    onColumnVisibilityModelChange={model =>
+                        setColumnVisibilityModel(model)
+                    }
+                    rows={tableData?.data?.rows || []}
+                    columns={columns}
+                    rowCount={rowCountState}
+                    pageSizeOptions={[10, 20, 50]}
+                    loading={isLoading}
+                    paginationMode="server"
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                    filterMode="server"
+                    onFilterModelChange={onFilterChange}
+                />
+            )}
         </div>
-        {tableData?.statusCode === statusCode.BAD_REQUEST ? <ZSError message={tableData?.message} /> :
-            <DataGrid
-                columnVisibilityModel={columnVisibilityModel}
-                onColumnVisibilityModelChange={(model) => setColumnVisibilityModel(model)}
-                rows={tableData?.data?.rows || []}
-                columns={columns}
-                rowCount={rowCountState}
-                pageSizeOptions={[10, 20, 50]}
-                loading={isLoading}
-                paginationMode="server"
-                paginationModel={paginationModel}
-                onPaginationModelChange={setPaginationModel}
-                filterMode="server"
-                onFilterModelChange={onFilterChange}
-            />}
-    </div>
-}
+    );
+};
 
 export default Table;
